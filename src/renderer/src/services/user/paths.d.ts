@@ -22,7 +22,10 @@ declare namespace Api {
       }
 
       /** 响应 */
-      interface Response {}
+      interface Response {
+        /** 密钥串 */
+        session: string
+      }
     }
 
     /**
@@ -48,7 +51,10 @@ declare namespace Api {
       }
 
       /** 响应 */
-      interface Response {}
+      interface Response {
+        /** 密钥串 */
+        session: string
+      }
     }
 
     /**
@@ -74,7 +80,10 @@ declare namespace Api {
       }
 
       /** 响应 */
-      interface Response {}
+      interface Response {
+        /** 账号 */
+        account: number
+      }
     }
 
     /**
@@ -102,7 +111,12 @@ declare namespace Api {
       }
 
       /** 响应 */
-      interface Response {}
+      interface Response {
+        /** 状态码 */
+        code: number
+        /** 响应信息 */
+        message: string
+      }
     }
 
     /**
@@ -122,7 +136,20 @@ declare namespace Api {
       interface Request {}
 
       /** 响应 */
-      interface Response {}
+      interface Response {
+        /** 头像 */
+        avatar: number
+        /** 账号 */
+        account: string
+        /** 昵称 */
+        nickname: number
+        /** 带*的手机号 */
+        phone: string
+        /** 用户id */
+        id: number
+        /** 头像框 */
+        avatar_frame: number
+      }
     }
 
     /**
@@ -170,7 +197,12 @@ declare namespace Api {
       }
 
       /** 响应 */
-      interface Response {}
+      interface Response {
+        /** 状态码 */
+        code: number
+        /** 响应信息 */
+        message: string
+      }
     }
 
     /**
@@ -194,7 +226,16 @@ declare namespace Api {
       }
 
       /** 响应 */
-      interface Response {}
+      interface Response {
+        /** 状态码 */
+        code: number
+        /** 响应信息 */
+        message: string
+        /** 追踪id */
+        trace_id: string
+        /** 用户展示文本 */
+        text: string
+      }
     }
   }
 }

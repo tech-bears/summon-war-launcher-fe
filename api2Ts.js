@@ -5,7 +5,7 @@ const httpsAgent = new https.Agent({
   rejectUnauthorized: false
 })
 axios.defaults.httpsAgent = httpsAgent
-const output = './src/renderer/src/service/user'
+const output = './src/renderer/src/services/user'
 //https://apifox.com/apidoc/shared-298df24a-8180-4b00-9479-a06337f9a081
 const share_id = '298df24a-8180-4b00-9479-a06337f9a081'
 
@@ -18,63 +18,63 @@ mkdirSync(`${distPath}`, { recursive: true })
 // 先抽离schemas
 const schemasUrl = `https://www.apifox.cn/api/v1/shared-docs/${share_id}/data-schemas`
 let allSchema = {}
-axios.get(schemasUrl).then((res) => {
-  const schemasData = res.data.data
-  console.log(`**************成功请求 schemas 数据**************`)
-  // 处理schema
-  let result = ''
-  schemasData.forEach((item) => {
-    const schemaId = item.id
-    const schemaName = item.name
+// axios.get(schemasUrl).then((res) => {
+//   const schemasData = res.data.data
+//   console.log(`**************成功请求 schemas 数据**************`)
+//   // 处理schema
+//   let result = ''
+//   schemasData.forEach((item) => {
+//     const schemaId = item.id
+//     const schemaName = item.name
 
-    // 收集所有的schema的id
-    allSchema = {
-      ...allSchema,
-      [schemaId]: schemaName
-    }
+//     // 收集所有的schema的id
+//     allSchema = {
+//       ...allSchema,
+//       [schemaId]: schemaName
+//     }
 
-    const properties = item.jsonSchema.properties
-    const schemaTitle = formatSchemaName(item.jsonSchema.title)
-    // 先把所有enum类型提前生成
-    if (properties) {
-      for (let key in properties) {
-        const property = properties[key]
-        if (property.enum) {
-          const enumName = schemaTitle + firstToLocaleUpperCase(key)
-          const description = property.description || ''
-          result += `
-    /** ${description} */
-    type ${enumName} = ${handleEnumType(property.enum)}`
-        }
-      }
-    }
-  })
+//     const properties = item.jsonSchema.properties
+//     const schemaTitle = formatSchemaName(item.jsonSchema.title)
+//     // 先把所有enum类型提前生成
+//     if (properties) {
+//       for (let key in properties) {
+//         const property = properties[key]
+//         if (property.enum) {
+//           const enumName = schemaTitle + firstToLocaleUpperCase(key)
+//           const description = property.description || ''
+//           result += `
+//     /** ${description} */
+//     type ${enumName} = ${handleEnumType(property.enum)}`
+//         }
+//       }
+//     }
+//   })
 
-  schemasData.forEach((item) => {
-    const properties = item.jsonSchema.properties
-    const required = item.jsonSchema.required
-    const description = item.jsonSchema.description || ''
-    const schemaTitle = formatSchemaName(item.jsonSchema.title)
+//   schemasData.forEach((item) => {
+//     const properties = item.jsonSchema.properties
+//     const required = item.jsonSchema.required
+//     const description = item.jsonSchema.description || ''
+//     const schemaTitle = formatSchemaName(item.jsonSchema.title)
 
-    result += `
-    /** ${description} */
-    interface ${schemaTitle} {${handleAllType(properties, required, schemaTitle)}
-    }`
-  })
+//     result += `
+//     /** ${description} */
+//     interface ${schemaTitle} {${handleAllType(properties, required, schemaTitle)}
+//     }`
+//   })
 
-  const componentPath = `${distPath}/schema.d.ts`
+//   const componentPath = `${distPath}/schema.d.ts`
 
-  writeFileSync(
-    componentPath,
-    `
-declare namespace Api {
-  namespace Schema {
-    ${result}
-  }
-}
-`
-  )
-})
+//   writeFileSync(
+//     componentPath,
+//     `
+// declare namespace Api {
+//   namespace Schema {
+//     ${result}
+//   }
+// }
+// `
+//   )
+// })
 
 // 抽离Paths, apifox数据结构是，先拿到api-tree，然后轮询id获取请求的request和response
 // api-tree数据请求地址
@@ -299,6 +299,7 @@ const convertPaths = (item) => {
 
       /** 响应 */
       interface Response  {
+        ${convertResponse(item.responses[0].jsonSchema.properties)}
       }
 
     }
@@ -307,19 +308,23 @@ const convertPaths = (item) => {
 }
 
 /** 转换body参数 */
-// function convertRequstBody(requestBody) {
-//   if (!requestBody || requestBody.type === 'none') {
-//     return ''
-//   }
-//   if (requestBody.type === 'application/json') {
-//     const bodyRef = requestBody.jsonSchema.$ref
-//     const bodySchemaName = convertRefType(bodyRef)
-//     if (bodySchemaName) {
-//       return `extends Api.Schema.${bodySchemaName}`
-//     }
-//   }
-//   return ''
-// }
+function convertResponse(properties) {
+  if (!properties || Object.keys(properties).length == 0) return ''
+  let fileContent = ''
+  const Params = Object.keys(properties)
+  Params.forEach((item) => {
+    if (item === 'code') {
+      properties[item]['description'] = '状态码'
+    }
+    if (item === 'message') {
+      properties[item]['description'] = '响应信息'
+    }
+    fileContent += `/** ${properties[item]['description']} */
+      ${item}: ${convertType(properties[item])}
+      `
+  })
+  return fileContent
+}
 
 /** 转换parameters参数 */
 function convertParameters(properties, required = []) {
@@ -383,7 +388,7 @@ function convertServices(item) {
 ** 请求方式: ${item.method}
 ** 接口描述: ${item.description}
 */
-export const ${apiName} = (params: Api.Paths.${apiName}.Request,headers: Api.Paths.${apiName}.Headers) => {
+export const ${apiName} = (params: Api.Paths.${apiName}.Request,headers?: Api.Paths.${apiName}.Headers) => {
   return request<Promise<Api.Paths.${apiName}.Response>>({
     url: \`${item.path.replace(/[{]/g, '${params.')}\`,
     method: "${item.method.toUpperCase()}",
