@@ -2,8 +2,8 @@ import type { AxiosRequestConfig } from 'axios'
 import axios from 'axios'
 //封装一个通用的ts版本的axios请求 包括请求拦截器和响应拦截器
 const instance = axios.create({
-  baseURL: process.env.VITE_APP_BASE_API,
-  timeout: 5000
+  baseURL: import.meta.env.VITE_BASE_URL as string,
+  timeout: 12000
 })
 //请求拦截器
 instance.interceptors.request.use(
