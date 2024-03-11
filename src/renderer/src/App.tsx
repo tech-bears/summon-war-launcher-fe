@@ -1,17 +1,15 @@
-import React from 'react'
-import styles from './index.module.less'
-import { APostRegister } from '@renderer/services/user'
+import { Navigate, Route, Routes, useRoutes } from 'react-router-dom'
+import routes from '@renderer/router'
 const App: React.FC = () => {
-  APostRegister({
-    phone_number: '123456789',
-    password: '123456',
-    code: '123456',
-    phone_prefix: '86'
-  }).then((res) => {})
   return (
-    <div>
-      <h1 className={styles.app}>Hello, Electron!</h1>
-      <h1 className={'.app'}>Hello, Electron!</h1>
+    <div className="app">
+      <Routes>
+        {routes.map((route) => {
+          return (
+            <Route key={route.path} path={route.path} element={route.element} />
+          )
+        })}
+      </Routes>
     </div>
   )
 }
