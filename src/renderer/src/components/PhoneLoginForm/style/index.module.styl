@@ -1,0 +1,70 @@
+// 游戏登录界面的账号密码输入框样式以及登录按钮样式
+.phone
+  width 100%
+  height 40px
+  margin-bottom 10px
+  padding 0 10px
+  border 1px solid #ccc
+  border-radius 5px
+  font-size 16px
+  outline none
+  &:focus
+    border-color #00a1d6
+    box-shadow 0 0 5px #00a1d6
+.code
+  width 70%
+  height 40px
+  margin-bottom 20px
+  padding 0 10px
+  border 1px solid #ccc
+  border-radius 5px
+  // 右上右下不要圆角
+  border-top-right-radius 0
+  border-bottom-right-radius 0
+  font-size 16px
+  outline none
+  &:focus
+    border-color #00a1d6
+    box-shadow 0 0 5px #00a1d6
+.get_code
+  border 1px solid #ccc
+  display inline-block
+  width 30%
+  height 40px
+  text-align center
+  line-height 40px
+  background-color #f1f8fa
+  color #c1b61a
+  border-radius 5px
+  font-size 14px
+  cursor pointer
+  outline none
+  vertical-align middle
+  // 左上左下不要圆角
+  border-top-left-radius 0
+  border-bottom-left-radius 0
+  margin-top -3px
+  // &:hover
+  // background-color #0088a3
+  // &:active
+  // background-color #006e87
+  &:disabled
+    background-color #ccc
+    cursor not-allowed
+.login_btn
+  width 100%
+  height 40px
+  background-color #00a1d6
+  color #fff
+  border none
+  border-radius 5px
+  font-size 16px
+  cursor pointer
+  outline none
+  &:hover
+    background-color #0088a3
+  &:active
+    background-color #006e87
+  &:disabled
+    background-color #ccc
+    cursor not-allowed

@@ -1,5 +1,5 @@
 import SuspenseLazy from '@renderer/components/SuspenseLazy'
-import { Navigate, RouteObject } from 'react-router-dom'
+import { RouteObject } from 'react-router-dom'
 
 const Login = SuspenseLazy(() => import('@renderer/view/Login'))
 

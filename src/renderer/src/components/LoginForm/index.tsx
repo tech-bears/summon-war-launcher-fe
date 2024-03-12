@@ -1,63 +1,65 @@
 /*
  * @Author: hypocrisy
- * @Date: 2024-03-11 22:05:55
+ * @Date: 2024-03-12 14:25:34
  * @LastEditors: hypocrisy
- * @LastEditTime: 2024-03-12 00:01:07
- * @FilePath: /summon-war-launcher-fe/src/renderer/src/components/LoginForm/index.tsx
+ * @LastEditTime: 2024-03-12 17:23:06
+ * @FilePath: \summon-war-launcher-fe\src\renderer\src\components\LoginForm\index.tsx
  */
-import { useRequest } from 'ahooks'
-import { APostNormal } from '@renderer/services/user'
-import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { useStores } from '@renderer/store'
+import NormalLoginForm from '@renderer/components/NormalLoginForm'
+import PhoneLoginForm from '@renderer/components/PhoneLoginForm'
 import styles from './style/index.module.styl'
+import { useState } from 'react'
+import Captcha from '../Captcha'
+import { useStores } from '@renderer/store'
+import { is } from '@electron-toolkit/utils'
 const LoginForm: React.FC = () => {
+  const [isNormalLogin, setIsNormalLogin] = useState(true)
   const { userStore } = useStores()
-  const { setUserInfo } = userStore
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const { run } = useRequest(APostNormal, {
-    manual: true,
-    onSuccess(res) {
-      setUserInfo(username, res.session)
-    }
-  })
+  const { verify, normalLogin } = userStore
   return (
-    <div className="flex flex-col">
-      <input
-        type="text"
-        placeholder="请输入账号"
-        className={styles.username}
-        value={username}
-        onChange={(e) => {
-          //如果不是数字则不允许输入
-          if (isNaN(+e.target.value)) {
-            return
-          }
-          setUsername(e.target.value)
-        }}
-      />
-      <input
-        type="password"
-        placeholder="请输入密码"
-        className={styles.password}
-        value={password}
-        onChange={(e) => {
-          setPassword(e.target.value)
-        }}
-      />
-      <button
-        className={styles.login_btn}
-        onClick={() => {
-          run({
-            account: +username,
-            password
-          })
-        }}
-      >
-        登&nbsp;&nbsp;&nbsp;录
-      </button>
+    <div style={{ width: 300 }}>
+      <div className={styles.login_tab}>
+        <button
+          className={styles.login_tab_item}
+          onClick={() => {
+            setIsNormalLogin(true)
+          }}
+        >
+          账号登录
+        </button>
+        <span
+          style={{
+            fontSize: 20,
+            fontWeight: 700,
+            backgroundColor: '#eee',
+            color: '#eee'
+          }}
+        >
+          |
+        </span>
+        <button
+          className={styles.login_tab_item}
+          onClick={() => {
+            setIsNormalLogin(false)
+          }}
+        >
+          手机号登录
+        </button>
+      </div>
+      <div>{isNormalLogin ? <NormalLoginForm /> : <PhoneLoginForm />}</div>
+      <div>
+        <button
+          className={styles.login_btn}
+          onClick={() => {
+            isNormalLogin ? normalLogin() : console.log('phone login')
+          }}
+          id="login-button"
+        >
+          登&nbsp;&nbsp;&nbsp;录
+        </button>
+      </div>
+      {verify && <Captcha />}
     </div>
   )
 }
-export default observer(LoginForm)
+export default LoginForm

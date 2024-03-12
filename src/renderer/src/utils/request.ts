@@ -8,6 +8,7 @@ const instance = axios.create({
 //请求拦截器
 instance.interceptors.request.use(
   (config) => {
+    console.log(config)
     return config
   },
   (error) => {
@@ -16,22 +17,38 @@ instance.interceptors.request.use(
 )
 //响应拦截器
 instance.interceptors.response.use(
-  (response) => {
+  (res) => {
     //对错误码进行处理
-    const res = response.data
-    if (res.code !== 200) {
-      return Promise.reject(new Error(res.message || 'Error'))
-    } else {
-      return res
-    }
+    return res
   },
-  (error) => {
-    return Promise.reject(error)
+  (err) => {
+    console.log(err)
+    const code = err.response?.data?.code
+    interface ErrParams {
+      status: number
+      code: number
+      text: string
+      needVertify: boolean
+    }
+    const errParams: ErrParams = {
+      status: err.response?.status,
+      code,
+      text: err.response?.data?.text,
+      needVertify: false
+    }
+    if (err.response?.status === 403) {
+      if (code === 65537) {
+        errParams.needVertify = true
+      }
+      if (code === 65538) {
+        localStorage.removeItem('SUMMON_WAR_SESSION')
+      }
+    }
+    return Promise.reject(errParams)
   }
 )
 export interface ResponseData<T> {
-  code: number
-  message: string
+  status: number
   data: T
 }
 export interface RequestConfig extends AxiosRequestConfig {
@@ -41,7 +58,7 @@ const request = async <T = any>(config: RequestConfig): Promise<T> => {
   try {
     const { data } = await instance.request<ResponseData<T>>(config)
     // 如果接口是返回文件，则没有code
-    return data?.code ? data.data : (data as any)
+    return data?.status ? data.data : (data as any)
   } catch (err) {
     return Promise.reject(err)
   }
